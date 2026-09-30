@@ -1,0 +1,182 @@
+/* Design tokens. Components use these names only, never raw colours. */
+:root {
+  --bg: #f4f4f1;
+  --surface: #fcfcfb;
+  --text: #1d1d1f;
+  --muted: #6b6b70;
+  --border: #e2e2de;
+  --accent: #3a6ea5;
+  --accent-soft: rgba(58, 110, 165, 0.12);
+  --danger: #b3261e;
+
+  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --mono: ui-monospace, 'Cascadia Code', Consolas, monospace;
+  --radius: 8px;
+  --gap: 16px;
+
+  font: 15px/1.5 var(--sans);
+  color-scheme: light dark;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f0f0e;
+    --surface: #1a1a19;
+    --text: #ececee;
+    --muted: #9a9aa2;
+    --border: #2e2e33;
+    --accent: #7aa7d9;
+    --accent-soft: rgba(122, 167, 217, 0.16);
+    --danger: #f2b8b5;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+code {
+  font-family: var(--mono);
+  font-size: 0.92em;
+}
+
+/* Controls shared by the data screens: one row above what they scope. */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 18px;
+  margin: 10px 0 12px;
+}
+
+.control {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.92em;
+  color: var(--muted);
+}
+
+.control select {
+  font: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 6px;
+}
+
+.control input[type='checkbox'] {
+  accent-color: var(--accent);
+}
+
+.btn {
+  font: inherit;
+  font-size: 0.92em;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.btn:hover {
+  border-color: var(--accent);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.tools {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+table.data {
+  border-collapse: collapse;
+  background: var(--surface);
+  font-size: 0.92em;
+  margin: 8px 0;
+}
+
+table.data th,
+table.data td {
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+
+table.data th {
+  font-weight: 600;
+  color: var(--muted);
+}
+
+table.data .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+table.data tr.total td {
+  font-weight: 600;
+  border-top: 1px solid var(--muted);
+}
+
+/* A segmented choice: two to four mutually exclusive buttons. */
+.seg {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.seg button {
+  font: inherit;
+  font-size: 0.92em;
+  padding: 4px 10px;
+  border: none;
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.seg button + button {
+  border-left: 1px solid var(--border);
+}
+
+.seg button.on {
+  background: var(--accent-soft);
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* A visible focus ring for keyboard users everywhere. */
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}

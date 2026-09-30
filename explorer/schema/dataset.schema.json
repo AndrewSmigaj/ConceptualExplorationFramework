@@ -1,0 +1,317 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "explorer/dataset.schema.json",
+  "title": "Explorer dataset",
+  "description": "A set of ideas with declared fields, scorings, runs, edges and figure presets. Domain-neutral: every field, scorer and generator is declared by the dataset, never assumed by the explorer.",
+  "type": "object",
+  "required": ["schema_version", "meta", "scorers", "generators", "fields", "ideas"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": 1},
+    "meta": {"$ref": "#/$defs/meta"},
+    "scorers": {"type": "array", "items": {"$ref": "#/$defs/scorer"}},
+    "generators": {"type": "array", "items": {"$ref": "#/$defs/generator"}},
+    "fields": {"type": "array", "items": {"$ref": "#/$defs/field"}},
+    "ideas": {"type": "array", "items": {"$ref": "#/$defs/idea"}},
+    "runs": {"type": "array", "items": {"$ref": "#/$defs/run"}},
+    "edge_kinds": {
+      "description": "Declares every edge kind. `duplicate` marks a kind meaning 'these two ideas make the same point'; the server holds back an unrevealed rating session's ideas together with their duplicates.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"$ref": "#/$defs/id"},
+          "label": {"$ref": "#/$defs/label"},
+          "description": {"type": "string"},
+          "duplicate": {"type": "boolean"}
+        }
+      }
+    },
+    "edges": {"type": "array", "items": {"$ref": "#/$defs/edge"}},
+    "presets": {"type": "array", "items": {"$ref": "#/$defs/preset"}},
+    "projections": {
+      "description": "Written by `explorer enrich`. Keyed by projection id.",
+      "type": "object",
+      "additionalProperties": {"$ref": "#/$defs/projection"}
+    },
+    "clusterings": {
+      "description": "Written by `explorer enrich`. Keyed by clustering id.",
+      "type": "object",
+      "additionalProperties": {"$ref": "#/$defs/clustering"}
+    }
+  },
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$"},
+    "label": {"type": "string", "minLength": 1},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+
+    "meta": {
+      "type": "object",
+      "required": ["id", "title", "generated_at", "producer"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "title": {"$ref": "#/$defs/label"},
+        "description": {"type": "string"},
+        "generated_at": {"type": "string", "format": "date-time"},
+        "producer": {"description": "The script that wrote this file, repo-relative.", "type": "string"},
+        "inputs": {
+          "description": "Repo-relative input path to its SHA-256, so a figure can be traced to the bytes it came from.",
+          "type": "object",
+          "additionalProperties": {"$ref": "#/$defs/sha256"}
+        },
+        "context": {
+          "description": "Documents shown beside ideas, such as the problem statement the ideas respond to.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "title", "text"],
+            "additionalProperties": false,
+            "properties": {
+              "id": {"$ref": "#/$defs/id"},
+              "title": {"$ref": "#/$defs/label"},
+              "text": {"type": "string"}
+            }
+          }
+        },
+        "rubric": {"$ref": "#/$defs/rubric"}
+      }
+    },
+
+    "rubric": {
+      "description": "The scoring instrument. `text` is shown verbatim to human raters.",
+      "type": "object",
+      "required": ["id", "text", "dimensions"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "text": {"type": "string"},
+        "dimensions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["id", "label", "min", "max", "direction"],
+            "additionalProperties": false,
+            "properties": {
+              "id": {"$ref": "#/$defs/id"},
+              "label": {"$ref": "#/$defs/label"},
+              "description": {"type": "string"},
+              "min": {"type": "number"},
+              "max": {"type": "number"},
+              "direction": {
+                "description": "Which end is better: `higher`, `lower`, or `neutral` when the dimension is not a quality measure.",
+                "enum": ["higher", "lower", "neutral"]
+              },
+              "headline": {"description": "True for the one dimension shown by default.", "type": "boolean"}
+            }
+          }
+        }
+      }
+    },
+
+    "scorer": {
+      "type": "object",
+      "required": ["id", "label", "kind"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "label": {"$ref": "#/$defs/label"},
+        "kind": {"enum": ["model", "human"]},
+        "generator": {
+          "description": "The generator id this scorer shares an identity with, so an idea can be marked as scored by its own author.",
+          "$ref": "#/$defs/id"
+        }
+      }
+    },
+
+    "generator": {
+      "type": "object",
+      "required": ["id", "label"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "label": {"$ref": "#/$defs/label"},
+        "description": {"type": "string"}
+      }
+    },
+
+    "field": {
+      "description": "A declared value on ideas. A facet is categorical, a metric is numeric, a text is free text shown and searched but never used to colour or group. A per-scorer field has one value per scorer.",
+      "type": "object",
+      "required": ["id", "label", "kind"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "label": {"$ref": "#/$defs/label"},
+        "description": {"type": "string"},
+        "kind": {"enum": ["facet", "metric", "text"]},
+        "per_scorer": {"type": "boolean", "default": false},
+        "values": {
+          "description": "Facets only: the allowed values, in display order.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "label"],
+            "additionalProperties": false,
+            "properties": {
+              "id": {"type": ["string", "integer"]},
+              "label": {"$ref": "#/$defs/label"},
+              "description": {"type": "string"}
+            }
+          }
+        },
+        "ordered": {"description": "Facets only: the values have a meaningful order.", "type": "boolean"},
+        "unit": {"description": "Metrics only.", "type": "string"},
+        "sequence": {"description": "Metrics only: whole numbers giving the order ideas were produced in (a round, a generation). Explore's growth replay steps through it.", "type": "boolean"}
+      }
+    },
+
+    "idea": {
+      "type": "object",
+      "required": ["id", "text"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "text": {"type": "string", "minLength": 1},
+        "essence": {"type": "string"},
+        "author": {"description": "A generator id.", "$ref": "#/$defs/id"},
+        "parents": {"type": "array", "items": {"$ref": "#/$defs/id"}},
+        "run": {"description": "A run id.", "$ref": "#/$defs/id"},
+        "facets": {
+          "type": "object",
+          "additionalProperties": {"type": ["string", "integer", "null"]}
+        },
+        "metrics": {
+          "type": "object",
+          "additionalProperties": {"type": ["number", "null"]}
+        },
+        "texts": {
+          "type": "object",
+          "additionalProperties": {"type": ["string", "null"]}
+        },
+        "per_scorer": {
+          "description": "Scorer id to {field id: value}, for fields declared per_scorer.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": {"type": ["string", "integer", "number", "null"]}
+          }
+        },
+        "scorings": {
+          "description": "Scorer id to its scoring of this idea.",
+          "type": "object",
+          "additionalProperties": {"$ref": "#/$defs/scoring"}
+        }
+      }
+    },
+
+    "scoring": {
+      "type": "object",
+      "required": ["dims"],
+      "additionalProperties": false,
+      "properties": {
+        "dims": {
+          "description": "Rubric dimension id to value, or null when the scoring failed.",
+          "type": ["object", "null"],
+          "additionalProperties": {"type": "number"}
+        },
+        "ref": {"description": "A pointer to the raw record, such as a trace or call id.", "type": "string"},
+        "note": {"type": "string"},
+        "flags": {"description": "Caveats a view must show with the scoring, e.g. 'corrected after reveal'.", "type": "array", "items": {"type": "string"}}
+      }
+    },
+
+    "run": {
+      "type": "object",
+      "required": ["id", "label", "status"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "label": {"$ref": "#/$defs/label"},
+        "status": {"enum": ["done", "refused", "failed", "partial"]},
+        "author": {"$ref": "#/$defs/id"},
+        "facets": {"type": "object", "additionalProperties": {"type": ["string", "integer", "null"]}},
+        "counts": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 0}},
+        "note": {"type": "string"}
+      }
+    },
+
+    "edge": {
+      "type": "object",
+      "required": ["kind", "source", "target"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {"$ref": "#/$defs/id"},
+        "source": {"$ref": "#/$defs/id"},
+        "target": {"$ref": "#/$defs/id"},
+        "weight": {"type": "number"},
+        "note": {"type": "string"}
+      }
+    },
+
+    "preset": {
+      "description": "A named figure. `kind` picks the chart; `spec` configures it with references to declared fields, rubric dimensions and scorers (see explorer/README.md, 'Figure presets'). References are checked by contract.py.",
+      "type": "object",
+      "required": ["id", "title", "kind", "spec"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "title": {"$ref": "#/$defs/label"},
+        "caption": {"type": "string"},
+        "kind": {"enum": ["projection", "scatter", "table", "paired"]},
+        "spec": {"type": "object"}
+      }
+    },
+
+    "projection": {
+      "type": "object",
+      "required": ["method", "dims", "coords"],
+      "additionalProperties": false,
+      "properties": {
+        "label": {"type": "string"},
+        "method": {"type": "string"},
+        "dims": {"enum": [2, 3]},
+        "source": {"description": "What was embedded, e.g. essence.", "type": "string"},
+        "params": {"type": "object"},
+        "explained_variance": {"type": "array", "items": {"type": "number"}},
+        "coords": {
+          "type": "object",
+          "additionalProperties": {"type": "array", "items": {"type": "number"}, "minItems": 2, "maxItems": 3}
+        }
+      }
+    },
+
+    "clustering": {
+      "type": "object",
+      "required": ["method", "assignments", "clusters"],
+      "additionalProperties": false,
+      "properties": {
+        "label": {"type": "string"},
+        "method": {"type": "string"},
+        "params": {"type": "object"},
+        "assignments": {
+          "description": "Idea id to cluster id. -1 is noise.",
+          "type": "object",
+          "additionalProperties": {"type": "integer"}
+        },
+        "clusters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "size"],
+            "additionalProperties": false,
+            "properties": {
+              "id": {"type": "integer"},
+              "size": {"type": "integer", "minimum": 1},
+              "terms": {"type": "array", "items": {"type": "string"}}
+            }
+          }
+        }
+      }
+    }
+  }
+}

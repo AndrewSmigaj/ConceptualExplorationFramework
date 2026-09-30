@@ -1,0 +1,50 @@
+[project]
+name = "idea-evolver"
+version = "0.0.0"
+description = "Evolving ideas with Claude: operators, tiered judging, diversity-preserving selection."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "ruff",
+    "sentence-transformers>=6.1.0",
+    "torch>=2.14.0",
+]
+explorer = [
+    "fastapi>=0.141.1",
+    "httpx2>=2.13.1",
+    "jsonschema>=4.26.0",
+    "playwright>=1.63.0",
+    "umap-learn>=0.5.12",
+    "uvicorn[standard]>=0.54.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+markers = [
+    "live: makes real model calls; run only on request with -m live",
+    "browser: drives the built explorer in headless Chromium; run with -m browser",
+]
+addopts = "-m 'not live and not browser'"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.uv]
+# The explorer's tests run under a plain `uv run pytest`, so its group is a default.
+default-groups = ["dev", "explorer"]
+
+# CPU-only torch: the CUDA wheels are ~2.5GB and the pilot embeds a few hundred
+# short texts. Revisit when the local open-weights model track starts.
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }

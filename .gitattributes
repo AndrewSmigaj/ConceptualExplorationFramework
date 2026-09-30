@@ -1,0 +1,7 @@
+# Text files are stored and checked out with LF. See docs/decisions/0002.
+* text=auto eol=lf
+
+# Source texts and external inputs are quoted verbatim and hashed.
+# Git must never convert their bytes.
+projects/*/sources/** -text
+inputs/** -text

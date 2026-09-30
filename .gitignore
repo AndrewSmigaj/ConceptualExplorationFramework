@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+
+# Frontend (explorer/web). dist/ above also covers its build output.
+node_modules/
+
+# Run artifacts. These are large or regenerated. Traces and pool state are not
+# recoverable once lost, so they need a backup policy of their own (open issue OI-14).
+projects/*/dispatch/
+projects/*/inbox/
+projects/*/pool/
+projects/*/traces/
+projects/*/viz/
+
+# Local caches and model weights
+.cache/
+models/
+
+# The original input copies, kept in place for reference. The tracked byte-exact
+# copies are in inputs/ and projects/*/sources/ (see inputs/MANIFEST.md).
+/temporaryprojectdefinition.md
+/ConceptualExplorationFieldManual.pdf
+
+# Editors and OS
+*.code-workspace
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*:Zone.Identifier
+
+# Stray files from ad-hoc CLI tests
+/r[0-9].json
+/err[0-9].txt
+
+# explorer enrich: the fitted layout models that keep a dataset's map stable
+.layout/
