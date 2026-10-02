@@ -1,6 +1,6 @@
 # 0004: The repo lives on the Windows drive
 
-- **Status:** Accepted
+- **Status:** Superseded by [0007](0007-one-public-repo-on-wsl.md) (2026-10-01)
 - **Date:** 2026-09-19
 - **Supersedes:** [0002](0002-repo-location-and-line-endings.md), on location only. Its line-ending rules still stand.
 

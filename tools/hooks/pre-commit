@@ -1,0 +1,4 @@
+#!/bin/sh
+# Stops a commit that would put withheld material into this public repository.
+# Enabled per clone with: git config core.hooksPath tools/hooks
+exec uv run --quiet python tools/check_withheld.py --staged

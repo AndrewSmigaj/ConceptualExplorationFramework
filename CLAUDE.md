@@ -43,10 +43,10 @@ Read `docs/status.md` first: it gives where things stand and the next step.
 - **Source files.** Files in `projects/*/sources/` and `inputs/` are byte-exact. Never edit, reformat or re-save them. Their SHA-256 hashes are in `inputs/MANIFEST.md`.
 - **Domain neutrality.** Core code never names a domain's axes, lenses, kinds or arms, and never assumes how many there are (brief §2).
 - **Line endings.** Use LF only (`.gitattributes`). Do not let tools write CRLF.
-- **Publishing.** This repo is private and is never pushed to GitHub. The public copy is built by `tools/publish.py` into `../ConceptualExplorationFramework` and pushed from there.
-  - `tools/publish.py` withholds the pilot and its example problems.
-  - It refuses to publish if any withheld text or marker remains.
-  - Its redactions must match exactly, or the build stops.
+- **This repository is public** ([decision 0007](docs/decisions/0007-one-public-repo-on-wsl.md)). An earlier critique pilot and its two example problems are private: they live in `~/critique-pilot-archive`, never here.
+  - Nothing from the archive enters this repo: no problem text, no generated critique, no names or wording that identify them.
+  - A pre-commit check (`tools/check_withheld.py`, enabled per clone with `git config core.hooksPath tools/hooks`) stops any commit that contains a withheld pattern or shares eight consecutive words with withheld text. Never bypass it (no `--no-verify`).
+- **Nothing is frozen.** Anything can change when there is a better way; ask the user before changing the design. Documents describe the current design and are edited in place, with no addendums. Git and the call records keep history; decision records say why something changed.
 - **Milestones.** One branch per milestone. The user reviews each milestone's exit before the next one starts.
 
 ## Tooling

@@ -8,11 +8,9 @@ A system for evolving ideas with Claude. It generates ideas and perturbs them wi
 
 ## This repository
 
-This is the public copy of a private working repository. It holds the design, the explorer app and its tests, and the Conceptual Exploration Field Manual (`inputs/cefm/`). The pilot experiment (`experiments/`) and its example problems (`projects/`) are not published, and passages that used them are marked as withheld.
+This is the project's working repository, and it is public. An earlier pilot, which critiqued two example arguments, is kept privately and is not part of it; passages of the design that used those examples are marked as withheld. The Conceptual Exploration Field Manual is in `inputs/cefm/`.
 
-Two notes for working on the Windows drive:
-- `core.fileMode` is `false` here, or git would report every file as modified.
-- Editors on Windows can save CRLF line endings. `.gitattributes` keeps repo text as LF and leaves source texts untouched.
+It lives on WSL's own disk (`~/ConceptualExplorationFramework`) because file access there is many times faster than on the Windows drive ([decision 0007](docs/decisions/0007-one-public-repo-on-wsl.md)). Open it in VS Code from a WSL terminal with `code ~/ConceptualExplorationFramework`.
 
 ## Documents
 

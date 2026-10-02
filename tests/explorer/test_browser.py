@@ -167,7 +167,8 @@ def test_rating_is_blind_then_reveals(page):
     pg.click("button:has-text('Finish and reveal')")
     pg.click("button:has-text('Reveal now')")
     pg.wait_for_selector("text=Results")
-    assert pg.locator("text=Group label").count() >= 1
+    # The rows render after the heading, so wait for them rather than counting at once.
+    pg.wait_for_selector("text=Group label")
     assert not errors
 
 
